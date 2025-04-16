@@ -1,0 +1,64 @@
+---- Clear existing data (optional)
+---- DELETE FROM users;
+--
+---- Insert Super Admin (ONLY approved user)
+----INSERT INTO users (username, password, emailId, role, approved) VALUES
+----('Admin', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'admin@example.com', 'SUPER_ADMIN', true);
+--
+---- Insert all other users with approved=false
+--INSERT INTO tds.users (username, password, emailId, role, approved) VALUES
+---- Stakeholders (5) password123
+--('Shyam', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'shyam@example.com', 'Stakeholder', false),
+--('Rahul', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'rahul@example.com', 'Stakeholder', false),
+--('Priya', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'priya@example.com', 'Stakeholder', false),
+--('Anjali', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'anjali@example.com', 'Stakeholder', false),
+--('Vikram', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'vikram@example.com', 'Stakeholder', false),
+--
+---- PMs (5)
+--('Meni', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'meni@example.com', 'PM', false),
+--('Arjun', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'arjun@example.com', 'PM', false),
+--('Neha', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'neha@example.com', 'PM', false),
+--('Rohan', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'rohan@example.com', 'PM', false),
+--('Kavita', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'kavita@example.com', 'PM', false),
+--
+---- SMEs (5)
+--('Manu', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'manu@example.com', 'SME', false),
+--('Divya', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'divya@example.com', 'SME', false),
+--('Amit', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'amit@example.com', 'SME', false),
+--('Pooja', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'pooja@example.com', 'SME', false),
+--('Rajesh', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'rajesh@example.com', 'SME', false),
+--
+---- L1 (5)
+--('Rishab', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'rishab@example.com', 'L1', false),
+--('Suresh', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'suresh@example.com', 'L1', false),
+--('Meena', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'meena@example.com', 'L1', false),
+--('Vivek', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'vivek@example.com', 'L1', false),
+--('Ananya', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'ananya@example.com', 'L1', false),
+--
+---- L2 (5)
+--('Sai', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'sai@example.com', 'L2', false),
+--('Deepak', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'deepak@example.com', 'L2', false),
+--('Sunita', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'sunita@example.com', 'L2', false),
+--('Alok', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'alok@example.com', 'L2', false),
+--('Ishita', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'ishita@example.com', 'L2', false),
+--
+---- L3(5)
+--('Sneha', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'sneha@example.com', 'L3', false),
+--('Kiran', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'kiran@example.com', 'L3', false),
+--('Vijay', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'vijay@example.com', 'L3', false),
+--('Swati', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'swati@example.com', 'L3', false),
+--('Harish', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'harish@example.com', 'L3', false),
+--
+---- BU (5)
+--('Sharon', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'sharon@example.com', 'BU', false),
+--('Nitin', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'nitin@example.com', 'BU', false),
+--('Pallavi', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'pallavi@example.com', 'BU', false),
+--('Gaurav', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'gaurav@example.com', 'BU', false),
+--('Tanvi', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'tanvi@example.com', 'BU', false),
+--
+---- Contractors (5)
+--('Amar', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'amar@example.com', 'Contractor', false),
+--('Bobby', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'bobby@example.com', 'Contractor', false),
+--('Chetan', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'chetan@example.com', 'Contractor', false),
+--('Dinesh', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'dinesh@example.com', 'Contractor', false),
+--('Esha', '$2a$10$EFdJz6bR2XQZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZJ9cUQ1nB.OU6JZ', 'esha@example.com', 'Contractor', false)ON CONFLICT (username) DO NOTHING;
