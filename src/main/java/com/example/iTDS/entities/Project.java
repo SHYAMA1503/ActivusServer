@@ -9,8 +9,8 @@ import org.hibernate.annotations.FetchMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
+
 @Getter
 @Setter
 @Entity
@@ -50,6 +50,113 @@ public class Project {
     @JsonIgnore
     private List<TDS> tdsList = new ArrayList<>();
     private LocalDateTime createdAt;
+
+    public Project() {
+
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public Project(Long projectId, String projectName, String projectDescription, boolean projectStatus, String remarks, User stakeholder, Map<Role, List<Long>> roleAssignments, List<TDS> tdsList, LocalDateTime createdAt, LocalDateTime updatedAt, Set<User> contractors) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+        this.projectDescription = projectDescription;
+        this.projectStatus = projectStatus;
+        this.remarks = remarks;
+        this.stakeholder = stakeholder;
+        this.roleAssignments = roleAssignments;
+        this.tdsList = tdsList;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.contractors = contractors;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProjectDescription() {
+        return projectDescription;
+    }
+
+    public void setProjectDescription(String projectDescription) {
+        this.projectDescription = projectDescription;
+    }
+
+    public boolean isProjectStatus() {
+        return projectStatus;
+    }
+
+    public void setProjectStatus(boolean projectStatus) {
+        this.projectStatus = projectStatus;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public User getStakeholder() {
+        return stakeholder;
+    }
+
+    public void setStakeholder(User stakeholder) {
+        this.stakeholder = stakeholder;
+    }
+
+    public Map<Role, List<Long>> getRoleAssignments() {
+        return roleAssignments;
+    }
+
+    public void setRoleAssignments(Map<Role, List<Long>> roleAssignments) {
+        this.roleAssignments = roleAssignments;
+    }
+
+    public List<TDS> getTdsList() {
+        return tdsList;
+    }
+
+    public void setTdsList(List<TDS> tdsList) {
+        this.tdsList = tdsList;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Set<User> getContractors() {
+        return contractors;
+    }
+
+    public void setContractors(Set<User> contractors) {
+        this.contractors = contractors;
+    }
+
     private LocalDateTime updatedAt;
 
     @PrePersist

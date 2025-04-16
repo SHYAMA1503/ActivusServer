@@ -27,6 +27,6 @@ public class SuperAdminController {
     public ResponseEntity<?> approveUser(@RequestBody ApproveUserRequest request) {
         User user = superAdminService.approveUser(request.getUserId(), request.isApprove());
         String message = request.isApprove() ? "User approved!" : "User rejected!";
-        return ResponseEntity.ok(new ApiResponse(200, message, user));
+        return ResponseEntity.ok(new ApiResponse(user, message, 200));
     }
 }

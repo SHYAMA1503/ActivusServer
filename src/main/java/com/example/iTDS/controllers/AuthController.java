@@ -42,18 +42,18 @@ public class AuthController {
     @PostMapping("/register")
         public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
             User user = userService.registerUser(userDTO);
-            return ResponseEntity.ok(new ApiResponse(200, "User created successfully", new UserResponse(user.getId(), user.getUsername(), user.getEmailId(), user.getRole())));
-        }
+        return ResponseEntity.ok(new ApiResponse(new UserResponse(user.getId(), user.getUsername(), user.getEmailId(), user.getRole()), "User created successfully", 200));
+    }
 
         @PostMapping("/login")
         public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
             String token = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), loginDTO.getRole());
-            return ResponseEntity.ok(new ApiResponse(200, "User login successfully", token));
+            return ResponseEntity.ok(new ApiResponse(token, "User login successfully", 200));
         }
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
-        return ResponseEntity.ok(new ApiResponse(200, "Users retrieved successfully", users));
+        return ResponseEntity.ok(new ApiResponse(users, "Users retrieved successfully", 200));
     }
     @GetMapping("/role")
     public ResponseEntity<?> getAllRoles() {
@@ -71,7 +71,7 @@ public class AuthController {
                 ))
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new ApiResponse(200, "Approved users retrieved successfully", approvedUsers));
+        return ResponseEntity.ok(new ApiResponse(approvedUsers, "Approved users retrieved successfully", 200));
     }
 
     @GetMapping("/{role}/users")
@@ -92,7 +92,7 @@ public class AuthController {
                 ))
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new ApiResponse(200, "Users for role " + role, users));
+        return ResponseEntity.ok(new ApiResponse(users, "Users for role " + role, 200));
     }
 
 

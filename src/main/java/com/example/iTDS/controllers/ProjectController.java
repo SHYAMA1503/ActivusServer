@@ -42,13 +42,13 @@ public class ProjectController {
             @RequestHeader("Authorization") String token) {
         String currentUserRole = jwtUtil.extractRole(token.substring(7));
         Project project = projectService.createProjectWithRoles(projectDTO, currentUserRole);
-        return ResponseEntity.ok(new ApiResponse(200, "Project created successfully", project));
+        return ResponseEntity.ok(new ApiResponse(project, "Project created successfully", 200));
     }
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllProjectsWithUserDetails() {
         List<ProjectWithUsersDTO> projects = projectService.getAllProjectsWithUserDetails();
-        return ResponseEntity.ok(new ApiResponse(200, "Projects retrieved successfully", projects));
+        return ResponseEntity.ok(new ApiResponse(projects, "Projects retrieved successfully", 200));
     }
 
     @GetMapping("/assigned")
@@ -59,13 +59,13 @@ public class ProjectController {
             String role = jwtUtil.extractRole(token.substring(7));
 
             if (!role.equals(Role.SME.toString())) {
-                return ResponseEntity.ok(new ApiResponse(200, "No projects assigned", Collections.emptyList()));
+                return ResponseEntity.ok(new ApiResponse(Collections.emptyList(), "No projects assigned", 200));
             }
 
             // Find user by username to get ID
             Optional<User> user = userRepository.findByUsername(username);
             if (user.isEmpty()) {
-                return ResponseEntity.ok(new ApiResponse(200, "User not found", Collections.emptyList()));
+                return ResponseEntity.ok(new ApiResponse(Collections.emptyList(), "User not found", 200));
             }
 
             // Get all projects where this user is assigned as SME
@@ -87,10 +87,10 @@ public class ProjectController {
                     })
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(new ApiResponse(200, "Projects retrieved successfully", dtos));
+            return ResponseEntity.ok(new ApiResponse(dtos, "Projects retrieved successfully", 200));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Error fetching projects: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Error fetching projects: " + e.getMessage(), 500));
         }
     }
 
@@ -102,14 +102,14 @@ public class ProjectController {
             // Find user by username first
             Optional<User> user = userRepository.findByUsername(username);
             if (user.isEmpty()) {
-                return ResponseEntity.ok(new ApiResponse(200, "User not found", Collections.emptyList()));
+                return ResponseEntity.ok(new ApiResponse(Collections.emptyList(), "User not found", 200));
             }
 
             List<ProjectWithUsersDTO> projects = projectService.getProjectsAssignedToUser(user.get().getId(), role);
-            return ResponseEntity.ok(new ApiResponse(200, "Projects retrieved successfully", projects));
+            return ResponseEntity.ok(new ApiResponse(projects, "Projects retrieved successfully", 200));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Error fetching projects: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Error fetching projects: " + e.getMessage(), 500));
         }
     }
 
@@ -137,7 +137,7 @@ public class ProjectController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(400, e.getMessage(), null));
+                    .body(new ApiResponse(null, e.getMessage(), 400));
         }
     }
 }

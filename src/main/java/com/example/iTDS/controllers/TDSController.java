@@ -144,11 +144,11 @@ public class TDSController {
                     jwtUtil.extractRole(token.substring(7))
             );
 
-            return ResponseEntity.ok(new ApiResponse(200, "TDS created successfully", tds));
+            return ResponseEntity.ok(new ApiResponse(tds, "TDS created successfully", 200));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "TDS creation failed: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "TDS creation failed: " + e.getMessage(), 500));
         }
     }
     private void ensureDirectoryExists(String directoryPath) {
@@ -171,11 +171,11 @@ public class TDSController {
         try {
             List<TDS> tdsList = tdsService.getTDSByProject(projectId, username);
             return ResponseEntity.ok(
-                    new ApiResponse(200, "TDS retrieved successfully", tdsList)
+                    new ApiResponse(tdsList, "TDS retrieved successfully", 200)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(403, "Access denied: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Access denied: " + e.getMessage(), 403));
         }
     }
 
@@ -187,11 +187,11 @@ public class TDSController {
         try {
             List<TDS> result = tdsService.getAllNeedToBeRecheckedTDSBySME(username);
             return ResponseEntity.ok(
-                    new ApiResponse(200, "TDS needing recheck retrieved successfully", result)
+                    new ApiResponse(result, "TDS needing recheck retrieved successfully", 200)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(403, "Access denied: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Access denied: " + e.getMessage(), 403));
         }
     }
 
@@ -229,12 +229,12 @@ public class TDSController {
             TDS updatedTDS = tdsService.recheckRejectedTDSBySME(tdsId, combinedPaths, remarks, username);
 
             return ResponseEntity.ok(
-                    new ApiResponse(200, "TDS rechecked successfully", updatedTDS)
+                    new ApiResponse(updatedTDS, "TDS rechecked successfully", 200)
             );
         } catch (Exception e) {
             log.error("Recheck failed", e);
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(403, "Recheck failed: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Recheck failed: " + e.getMessage(), 403));
         }
     }
     // In TDSController.java
@@ -245,7 +245,7 @@ public class TDSController {
             @RequestParam String username) {  // Take username from frontend
         try {
             List<TDS> result = tdsService.getTDSForPMApproval(username);
-            return ResponseEntity.ok(new ApiResponse(200, "Success", result));
+            return ResponseEntity.ok(new ApiResponse(result, "Success", 200));
         } catch (Exception e) {
             return errorResponse(e);
         }
@@ -260,7 +260,7 @@ public class TDSController {
             @RequestParam String username) {  // Take username from frontend
         try {
             TDS updatedTDS = tdsService.processPMApproval(tdsId, approved, username);
-            return ResponseEntity.ok(new ApiResponse(200, "Action successful", updatedTDS));
+            return ResponseEntity.ok(new ApiResponse(updatedTDS, "Action successful", 200));
         } catch (Exception e) {
             return errorResponse(e);
         }
@@ -269,7 +269,7 @@ public class TDSController {
 
     private ResponseEntity<?> errorResponse(Exception e) {
         return ResponseEntity.status(500)
-                .body(new ApiResponse(500, "TDS Error: " + e.getMessage(), null));
+                .body(new ApiResponse(null, "TDS Error: " + e.getMessage(), 500));
     }
     @GetMapping("/need-to-approve/bu")
     public ResponseEntity<?> getAllNeedToBeApprovedTDSByBU(
@@ -277,7 +277,7 @@ public class TDSController {
             @RequestParam String username) {  // Take username from frontend
         try {
             List<TDS> result = tdsService.getAllNeedToBeApprovedTDSByBU(username);
-            return ResponseEntity.ok(new ApiResponse(200, "Success", result));
+            return ResponseEntity.ok(new ApiResponse(result, "Success", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -291,7 +291,7 @@ public class TDSController {
             @RequestParam String username) {  // Take username from frontend
         try {
             TDS updatedTDS = tdsService.approveTDSByBU(tdsId, approved, username);
-            return ResponseEntity.ok(new ApiResponse(200, "Action successful", updatedTDS));
+            return ResponseEntity.ok(new ApiResponse(updatedTDS, "Action successful", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -304,7 +304,7 @@ public class TDSController {
 
         try {
             List<TDS> result = tdsService.getAllNeedToBeApprovedTDSByL1(username);
-            return ResponseEntity.ok(new ApiResponse(200, "Success", result));
+            return ResponseEntity.ok(new ApiResponse(result, "Success", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -319,7 +319,7 @@ public class TDSController {
 
         try {
             TDS updatedTDS = tdsService.approveTDSByL1(tdsId, approved, username);
-            return ResponseEntity.ok(new ApiResponse(200, "Action successful", updatedTDS));
+            return ResponseEntity.ok(new ApiResponse(updatedTDS, "Action successful", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -333,7 +333,7 @@ public class TDSController {
 
         try {
             List<TDS> result = tdsService.getAllNeedToBeApprovedTDSByL2(username);
-            return ResponseEntity.ok(new ApiResponse(200, "Success", result));
+            return ResponseEntity.ok(new ApiResponse(result, "Success", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -348,7 +348,7 @@ public class TDSController {
 
         try {
             TDS updatedTDS = tdsService.approveTDSByL2(tdsId, approved, username);
-            return ResponseEntity.ok(new ApiResponse(200, "Action successful", updatedTDS));
+            return ResponseEntity.ok(new ApiResponse(updatedTDS, "Action successful", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -361,7 +361,7 @@ public class TDSController {
 
         try {
             List<TDS> result = tdsService.getAllNeedToBeApprovedTDSByL3(username);
-            return ResponseEntity.ok(new ApiResponse(200, "Success", result));
+            return ResponseEntity.ok(new ApiResponse(result, "Success", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -376,7 +376,7 @@ public class TDSController {
 
         try {
             TDS updatedTDS = tdsService.approveTDSByL3(tdsId, approved, username);
-            return ResponseEntity.ok(new ApiResponse(200, "Action successful", updatedTDS));
+            return ResponseEntity.ok(new ApiResponse(updatedTDS, "Action successful", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -391,7 +391,7 @@ public class TDSController {
 
         try {
             List<TDS> result = tdsService.getAllNeedToBeApprovedTDSByL2AfterL3(username);
-            return ResponseEntity.ok(new ApiResponse(200, "Success", result));
+            return ResponseEntity.ok(new ApiResponse(result, "Success", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -405,7 +405,7 @@ public class TDSController {
 
         try {
             TDS updatedTDS = tdsService.approveTDSByL2Acceptance(tdsId, username);
-            return ResponseEntity.ok(new ApiResponse(200, "Final approval successful", updatedTDS));
+            return ResponseEntity.ok(new ApiResponse(updatedTDS, "Final approval successful", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -420,7 +420,7 @@ public class TDSController {
 
         try {
             List<TDS> result = tdsService.getAllApprovedTDS(username);
-            return ResponseEntity.ok(new ApiResponse(200, "Success", result));
+            return ResponseEntity.ok(new ApiResponse(result, "Success", 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -439,9 +439,9 @@ public class TDSController {
 
         try {
             String responseMessage = tdsService.uploadApprovedTDSDocumentToS3(tdsId, username);
-            return ResponseEntity.ok(new ApiResponse(200, responseMessage, null));
+            return ResponseEntity.ok(new ApiResponse(null, responseMessage, 200));
         } catch (Exception e) {
-            return ResponseEntity.status(403).body(new ApiResponse(403, e.getMessage(), null));
+            return ResponseEntity.status(403).body(new ApiResponse(null, e.getMessage(), 403));
         }
     }
     // SME validates the document
@@ -457,10 +457,10 @@ public class TDSController {
             String message = isApproved ?
                     "Document approved by SME." :
                     "Document rejected by SME. Contractor must re-upload.";
-            return ResponseEntity.ok(new ApiResponse(200, message, null));
+            return ResponseEntity.ok(new ApiResponse(null, message, 200));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Validation failed: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Validation failed: " + e.getMessage(), 500));
         }
     }
 
@@ -477,10 +477,10 @@ public class TDSController {
             String message = isApproved ?
                     "Document approved by PM and sent to Contractor for purchase." :
                     "Document rejected by PM and sent back to SME.";
-            return ResponseEntity.ok(new ApiResponse(200, message, null));
+            return ResponseEntity.ok(new ApiResponse(null, message, 200));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Validation failed: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Validation failed: " + e.getMessage(), 500));
         }
     }
     @GetMapping("/rejectedBySME")
@@ -491,11 +491,11 @@ public class TDSController {
         try {
             List<TDS> result = tdsService.getRejectedDocumentsBySME(username);
             return ResponseEntity.ok(
-                    new ApiResponse(200, "Rejected documents retrieved successfully", result)
+                    new ApiResponse(result, "Rejected documents retrieved successfully", 200)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Failed to fetch documents: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Failed to fetch documents: " + e.getMessage(), 500));
         }
     }
     @GetMapping("/rejectedByPM")
@@ -506,11 +506,11 @@ public class TDSController {
         try {
             List<TDS> result = tdsService.getRejectedDocumentsByPM(username);
             return ResponseEntity.ok(
-                    new ApiResponse(200, "PM-rejected documents retrieved successfully", result)
+                    new ApiResponse(result, "PM-rejected documents retrieved successfully", 200)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Failed to fetch documents: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Failed to fetch documents: " + e.getMessage(), 500));
         }
     }
     @PostMapping("/reupload/{tdsId}")
@@ -537,10 +537,10 @@ public class TDSController {
                     keepExisting,
                     indicesToRemove
             );
-            return ResponseEntity.ok(new ApiResponse(200, responseMessage, null));
+            return ResponseEntity.ok(new ApiResponse(null, responseMessage, 200));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Re-upload failed: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Re-upload failed: " + e.getMessage(), 500));
         }
     }
     @GetMapping("/pendingSMEValidation")
@@ -551,11 +551,11 @@ public class TDSController {
         try {
             List<TDS> documents = tdsService.getDocumentsForSMEValidation(username);
             return ResponseEntity.ok(
-                    new ApiResponse(200, "Documents fetched successfully", documents)
+                    new ApiResponse(documents, "Documents fetched successfully", 200)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Failed to fetch documents: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Failed to fetch documents: " + e.getMessage(), 500));
         }
     }
 
@@ -567,11 +567,11 @@ public class TDSController {
         try {
             List<TDS> documents = tdsService.getDocumentsForPMValidation(username);
             return ResponseEntity.ok(
-                    new ApiResponse(200, "Documents pending PM validation fetched successfully", documents)
+                    new ApiResponse(documents, "Documents pending PM validation fetched successfully", 200)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Failed to fetch documents: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Failed to fetch documents: " + e.getMessage(), 500));
         }
     }
 
@@ -586,9 +586,9 @@ public class TDSController {
 
         try {
             String responseMessage = tdsService.finalizePurchaseAndUploadDocuments(tdsId, orderConfirmation, lrCopy, username);
-            return ResponseEntity.ok(new ApiResponse(200, responseMessage, null));
+            return ResponseEntity.ok(new ApiResponse(null, responseMessage, 200));
         } catch (Exception e) {
-            return ResponseEntity.status(403).body(new ApiResponse(403, e.getMessage(), null));
+            return ResponseEntity.status(403).body(new ApiResponse(null, e.getMessage(), 403));
         }
     }
     @GetMapping("/pmApproved")
@@ -599,11 +599,11 @@ public class TDSController {
         try {
             List<TDS> documents = tdsService.getPmApprovedTDSForContractor(username);
             return ResponseEntity.ok(
-                    new ApiResponse(200, "PM-approved TDS fetched successfully", documents)
+                    new ApiResponse(documents, "PM-approved TDS fetched successfully", 200)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(500, "Failed to fetch PM-approved TDS: " + e.getMessage(), null));
+                    .body(new ApiResponse(null, "Failed to fetch PM-approved TDS: " + e.getMessage(), 500));
         }
     }
 
