@@ -52,7 +52,7 @@
         @Bean
         public UrlBasedCorsConfigurationSource corsConfigurationSource() {
             CorsConfiguration corsConfiguration = new CorsConfiguration();
-            corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://activustdstest1-kappa.vercel.app","https://activustdstest1-shyamyobels-projects.vercel.app")); // Frontend origin
+            corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://activustdstest1-kappa.vercel.app","https://activustdstest1-shyamyobels-projects.vercel.app","https://activus-server-production.up.railway.app")); // Frontend origin
             corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
             corsConfiguration.setAllowCredentials(true);

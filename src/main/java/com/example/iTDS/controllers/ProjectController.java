@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/projects")
 @CrossOrigin(origins = { "http://localhost:3000", "https://activustdstest1-kappa.vercel.app/login",
-        "https://activustdstest1-shyamyobels-projects.vercel.app/login" })
+        "https://activustdstest1-shyamyobels-projects.vercel.app/login","https://activus-server-production.up.railway.app" })
 public class ProjectController {
     private final JwtUtil jwtUtil;
 
