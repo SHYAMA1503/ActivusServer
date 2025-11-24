@@ -1,13 +1,20 @@
 package com.example.iTDS.services;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+//import com.amazonaws.auth.AWSStaticCredentialsProvider;
+//import com.amazonaws.auth.BasicAWSCredentials;
+//import com.amazonaws.services.s3.AmazonS3;
+//import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+//import com.amazonaws.services.s3.model.AmazonS3Exception;
+//import com.amazonaws.services.s3.model.GetObjectRequest;
+//import com.amazonaws.services.s3.model.ObjectMetadata;
+//import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.blob.options.BlobParallelUploadOptions;
+import com.azure.storage.blob.models.BlobStorageException;
 import com.example.iTDS.entities.Project;
 import com.example.iTDS.entities.Role;
 import com.example.iTDS.entities.TDS;
@@ -34,7 +41,8 @@ public class TDSService {
 
     @Autowired
     private TDSRepository tdsRepository;
-    private final AmazonS3 amazonS3;
+    private final BlobContainerClient blobContainerClient;
+    private static final String CONTAINER_NAME = "activus-itds";
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -42,8 +50,18 @@ public class TDSService {
     private UserRepository userRepository;
     @Autowired
     private ProjectService projectService;
-    public TDSService(AmazonS3 amazonS3) {
-        this.amazonS3 = amazonS3;
+    @Autowired
+    public TDSService(TDSRepository tdsRepository,
+                      ProjectRepository projectRepository,
+                      UserRepository userRepository,
+                      ProjectService projectService) {
+        this.tdsRepository = tdsRepository;
+        this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
+        this.projectService = projectService;
+
+        // Initialize the Azure client using the new configuration method
+        this.blobContainerClient = configureAzureBlobClient();
     }
     public TDS findByDocumentPathContaining(String fileName) {
         List<TDS> tdsList = tdsRepository.findByDocumentPathContaining(fileName);
@@ -589,7 +607,7 @@ public class TDSService {
             );
         }
     }
-
+// need to start working from here
     public boolean isUsernameAssignedToProjectAsContractor(Long projectId, String username) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
@@ -624,7 +642,7 @@ public class TDSService {
                 .toList();
     }
 
-    public String uploadApprovedTDSDocumentToS3(Long tdsId, String username) {
+    public String uploadApprovedTDSDocumentToAzure(Long tdsId, String username) {
         try {
             // Validate user
             User user = userRepository.findByUsername(username)
@@ -656,7 +674,7 @@ public class TDSService {
             // Split multiple file paths
             String[] filesToUpload = documentPaths.split(",");
             List<String> uploadedFiles = new ArrayList<>();
-            AmazonS3 s3Client = configureS3Client();
+//            AmazonS3 s3Client = configureS3Client();
 
             // Get stakeholder username from project
             String stakeholderUsername = tds.getProject().getStakeholder().getUsername();
@@ -670,14 +688,21 @@ public class TDSService {
 
                 // Create S3 key with stakeholder username and original filename
                 String fileName = file.getName();
-                String s3Key = String.format("approved-tds/%s/%s/%s",
+                String blobKey = String.format("approved-tds/%s/%s/%s",
                         stakeholderUsername,
                         username,
                         fileName);
 
-                // Upload to S3
-                s3Client.putObject("activus-itds", s3Key, file);
-                uploadedFiles.add(s3Key);
+                // Upload to Azure
+                BlobClient blobClient = blobContainerClient.getBlobClient(blobKey);
+                try {
+                    // Upload the file from the local path
+                    blobClient.uploadFromFile(file.getAbsolutePath());
+                    uploadedFiles.add(blobKey);
+                } catch (Exception e) { // Catch all exceptions related to file or Azure upload
+                    System.out.println("Failed to upload file to Azure: " + e.getMessage());
+                    continue; // Skip to the next file
+                }
 
                 // Delete local file
                 if (file.delete()) {
@@ -691,36 +716,56 @@ public class TDSService {
                 throw new RuntimeException("No documents were successfully uploaded");
             }
 
-            // Update TDS with comma-separated S3 paths
+            // Update TDS with comma-separated Azure paths
             tds.setDocumentPath(String.join(",", uploadedFiles));
-            tds.setStatus("Uploaded to S3");
+            tds.setStatus("Uploaded to Azure");
             tds.setCurrentStep("SME Validation");
             tdsRepository.save(tds);
 
-            return "Files uploaded to S3: " + String.join(", ", uploadedFiles);
+            return "Files Uploaded to Azure: " + String.join(", ", uploadedFiles);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Upload failed: " + e.getMessage());
         }
     }
-
-    private AmazonS3 configureS3Client() {
+    private BlobContainerClient configureAzureBlobClient() {
         try {
-            // IMPORTANT: Store these credentials securely, not hardcoded
-            BasicAWSCredentials awsCreds = new BasicAWSCredentials(
-                    "AKIAXZEFIEVLRE2GPXH3",
-                    "egfgZraJ9CyPUe8UqEGkkWsB+Cwm8UUut66HA7bT"
-            );
+            // 🛑 REPLACE THIS WITH YOUR CONNECTION STRING
+            String connectStr = "DefaultEndpointsProtocol=https;AccountName=activusitdsstorage;AccountKey=HP5+mCFDVwajLprMUM3KMCXWDIf1vHJSF1e0WSHoJvIl7uTQl0uSlma9nyhFAAnrLxvc/7T3taPq+AStkaCWcA==;EndpointSuffix=core.windows.net";
 
-            return AmazonS3ClientBuilder.standard()
-                    .withRegion("eu-north-1")
-                    .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-                    .build();
+            BlobServiceClient serviceClient = new BlobServiceClientBuilder()
+                    .connectionString(connectStr)
+                    .buildClient();
+
+            BlobContainerClient containerClient = serviceClient.getBlobContainerClient(CONTAINER_NAME);
+
+            // Optional: Create the container if it doesn't exist
+            if (!containerClient.exists()) {
+                containerClient.create();
+            }
+            return containerClient;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to configure S3 client: " + e.getMessage());
+            throw new RuntimeException("Failed to configure Azure Blob client: " + e.getMessage());
         }
     }
+//    private AmazonS3 configureS3Client() {
+//        try {
+//            // IMPORTANT: Store these credentials securely, not hardcoded
+//            BasicAWSCredentials awsCreds = new BasicAWSCredentials(
+//                    "AKIAXZEFIEVLRE2GPXH3",
+//                    "egfgZraJ9CyPUe8UqEGkkWsB+Cwm8UUut66HA7bT"
+//            );
+//
+//            return AmazonS3ClientBuilder.standard()
+//                    .withRegion("eu-north-1")
+//                    .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+//                    .build();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new RuntimeException("Failed to configure S3 client: " + e.getMessage());
+//        }
+//    }
     public void validateDocumentBySME(Long tdsId, boolean isApproved, String username) {
         // Validate user
         User user = userRepository.findByUsername(username)
@@ -738,17 +783,17 @@ public class TDSService {
             throw new RuntimeException("SME not assigned to this project");
         }
 
-        // Get the full S3 path from TDS (which was stored during upload)
-        String s3Key = tds.getDocumentPath(); // This now contains the full path(s)
+        // Get the full Azure path from TDS (which was stored during upload)
+        String blobKey = tds.getDocumentPath(); // This now contains the full path(s)
 
         // For multiple files, you might want to handle them all or just the first one
         // Here we'll take the first file if there are multiple
-        String firstDocumentPath = s3Key.split(",")[0].trim();
+        String firstDocumentPath = blobKey.split(",")[0].trim();
 
-        System.out.println("S3 Key: " + firstDocumentPath);
+        System.out.println("Blob Key: " + firstDocumentPath);
 
-        // Download the document from S3
-        File document = downloadDocumentFromS3("activus-itds", firstDocumentPath, "local-path-to-temp-file");
+        // Download the document from Azure
+        File document = downloadDocumentFromAzure(firstDocumentPath, "local-path-to-temp-file");
 
         if (!isApproved) {
             tds.setRemarks("Document rejected by SME. Contractor must re-upload.");
@@ -787,17 +832,17 @@ public class TDSService {
             throw new RuntimeException("PM not assigned to this project");
         }
 
-        // Get the full S3 path from TDS (which was stored during upload)
-        String s3Key = tds.getDocumentPath(); // This contains the full path(s)
+        // Get the full Azure path from TDS
+        String blobKey = tds.getDocumentPath(); // This contains the full path(s)
 
         // Take the first file if there are multiple (consistent with SME validation)
-        String firstDocumentPath = s3Key.split(",")[0].trim();
+        String firstDocumentPath = blobKey.split(",")[0].trim();
 
-        System.out.println("S3 Key: " + firstDocumentPath);
+        System.out.println("Blob Key: " + firstDocumentPath);
 
         try {
-            // Download the document from S3
-            File document = downloadDocumentFromS3("activus-itds", firstDocumentPath, "local-path-to-temp-file");
+            // Download the document from Azure
+            File document = downloadDocumentFromAzure(firstDocumentPath, "local-path-to-temp-file");
 
             if (!isApproved) {
                 tds.setRemarks("Document rejected by PM and sent back to SME for re-validation.");
@@ -819,22 +864,37 @@ public class TDSService {
             throw new RuntimeException("Validation by PM failed: " + e.getMessage());
         }
     }
+    public File downloadDocumentFromAzure(String blobKey, String downloadPath) {
+        BlobClient blobClient = blobContainerClient.getBlobClient(blobKey);
+        File file = new File(downloadPath);
 
-    public File downloadDocumentFromS3(String bucketName, String keyName, String downloadPath) {
+        if (!blobClient.exists()) {
+            throw new RuntimeException("Document not found in Azure Blob Storage: " + blobKey);
+        }
+
         try {
-            File file = new File(downloadPath);
-            amazonS3.getObject(new GetObjectRequest(bucketName, keyName), file);
+            // Download the blob content to a local file
+            blobClient.downloadToFile(file.getAbsolutePath());
             return file;
-        } catch (AmazonS3Exception e) {
-            if (e.getStatusCode() == 404) {
-                throw new RuntimeException("Document not found in S3: " + keyName);
-            } else {
-                throw new RuntimeException("Failed to download document from S3: " + e.getMessage());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to download document from S3: " + e.getMessage());
+        } catch (BlobStorageException e) {
+            throw new RuntimeException("Failed to download document from Azure Blob: " + e.getMessage());
         }
     }
+//    public File downloadDocumentFromS3(String bucketName, String keyName, String downloadPath) {
+//        try {
+//            File file = new File(downloadPath);
+//            amazonS3.getObject(new GetObjectRequest(bucketName, keyName), file);
+//            return file;
+//        } catch (AmazonS3Exception e) {
+//            if (e.getStatusCode() == 404) {
+//                throw new RuntimeException("Document not found in S3: " + keyName);
+//            } else {
+//                throw new RuntimeException("Failed to download document from S3: " + e.getMessage());
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to download document from S3: " + e.getMessage());
+//        }
+//    }
     public List<TDS> getRejectedDocumentsBySME(String username) {
         // Validate user
         User user = userRepository.findByUsername(username)
@@ -902,9 +962,12 @@ public class TDSService {
                         stakeholderUsername,
                         username,
                         fileName);
-
-                // Upload to S3
-                amazonS3.putObject("activus-itds", newFileKey, file.getInputStream(), new ObjectMetadata());
+                // Upload to Azure
+                BlobClient blobClient = blobContainerClient.getBlobClient(newFileKey);
+                // Use upload method for InputStream (from MultipartFile)
+                blobClient.upload(file.getInputStream(), file.getSize(), true);
+//                // Upload to S3
+//                amazonS3.putObject("activus-itds", newFileKey, file.getInputStream(), new ObjectMetadata());
             }
 
             // Combine document paths
@@ -1084,15 +1147,22 @@ public class TDSService {
                     lrCopy.getOriginalFilename());
 
             // Upload both documents to S3
-            AmazonS3 s3Client = configureS3Client();
+//            AmazonS3 s3Client = configureS3Client();
+            BlobClient orderConfirmationClient = blobContainerClient.getBlobClient(orderConfirmationKey);
+            BlobClient lrCopyClient = blobContainerClient.getBlobClient(lrCopyKey);
             try {
                 // Upload Order Confirmation
-                s3Client.putObject(new PutObjectRequest("activus-itds", orderConfirmationKey,
-                        orderConfirmation.getInputStream(), new ObjectMetadata()));
+                orderConfirmationClient.upload(orderConfirmation.getInputStream(), orderConfirmation.getSize(), true); // Replaced AWS putObject
 
                 // Upload LR Copy
-                s3Client.putObject(new PutObjectRequest("activus-itds", lrCopyKey,
-                        lrCopy.getInputStream(), new ObjectMetadata()));
+                lrCopyClient.upload(lrCopy.getInputStream(), lrCopy.getSize(), true); // Replaced AWS putObject
+//                // Upload Order Confirmation
+//                s3Client.putObject(new PutObjectRequest("activus-itds", orderConfirmationKey,
+//                        orderConfirmation.getInputStream(), new ObjectMetadata()));
+//
+//                // Upload LR Copy
+//                s3Client.putObject(new PutObjectRequest("activus-itds", lrCopyKey,
+//                        lrCopy.getInputStream(), new ObjectMetadata()));
             } catch (IOException e) {
                 throw new RuntimeException("Failed to upload documents to S3", e);
             }
