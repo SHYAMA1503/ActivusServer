@@ -438,7 +438,7 @@ public class TDSController {
             @RequestParam String username) {
 
         try {
-            String responseMessage = tdsService.uploadApprovedTDSDocumentToS3(tdsId, username);
+            String responseMessage = tdsService.uploadApprovedTDSDocumentToAzure(tdsId, username);
             return ResponseEntity.ok(new ApiResponse(null, responseMessage, 200));
         } catch (Exception e) {
             return ResponseEntity.status(403).body(new ApiResponse(null, e.getMessage(), 403));
