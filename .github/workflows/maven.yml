@@ -10,48 +10,45 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    
-    # FINAL FIX: Set up JDK 17 (LTS) for guaranteed build compatibility
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17' 
-        distribution: 'temurin'
-        cache: maven
-        
-    # Build with Maven (creates target/*.jar)
-    - name: Build with Maven
-      # We skip tests here for the fastest build, which is fine for deployment.
-      run: mvn -B package -DskipTests --file pom.xml
-    
-    # Upload the compiled JAR artifact
-    - name: Upload JAR artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: spring-boot-app
-        path: target/*.jar
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' 
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B package -DskipTests --file pom.xml
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-boot-app
+          path: target/*.jar
   
   deploy:
-    # This job runs only after the 'build' job is complete
     needs: build
     runs-on: ubuntu-latest
     
     steps:
-    # Download the compiled JAR artifact
+    
+    # 🌟 NEW STEP: Login to Azure using the Service Principal (JSON)
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        
     - name: Download JAR artifact
       uses: actions/download-artifact@v4
       with:
         name: spring-boot-app
         
     # Deploy to Azure App Service
+    # Note: Because the login action ran above, we use the simpler parameters now.
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'Activus' # Ensure this matches your App Service name
         slot-name: 'Production'
-        # FINAL FIX: Changed 'publish-profile' to 'creds' to use JSON Service Principal
-        creds: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} 
+        # The 'creds' parameter is removed here, as authentication is handled by azure/login
         package: '*.jar'
