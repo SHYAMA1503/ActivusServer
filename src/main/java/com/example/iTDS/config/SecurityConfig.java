@@ -28,7 +28,7 @@
             http.csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
                     .authorizeHttpRequests(auth -> auth
                             // Permit public access to register and login
-                            .requestMatchers("/api/auth/register", "/api/auth/login","https://activustdstest1-kappa.vercel.app/login","https://activus-omega.vercel.app/","https://activus-iota.vercel.app/login","https://activus-iota.vercel.app/","https://activus-omega.vercel.app/","https://activus-omega.vercel.app/login","https://activustdstest1-shyamyobels-projects.vercel.app/login"
+                            .requestMatchers("/api/auth/register", "/api/auth/login","https://activustdstest1-kappa.vercel.app/login","https://activus-omega.vercel.app/","https://activus-rho.vercel.app/login","https://activus-rho.vercel.app/","https://activus-omega.vercel.app/","https://activus-omega.vercel.app/login","https://activustdstest1-shyamyobels-projects.vercel.app/login"
                                     ,"https://activustdstest1-shyamyobels-projects.vercel.app/register", "https://activustdstest1-shyamyobels-projects.vercel.app/register").permitAll()
                             // Authenticate all other endpoints
                             .anyRequest().authenticated()
@@ -52,7 +52,7 @@
         @Bean
         public UrlBasedCorsConfigurationSource corsConfigurationSource() {
             CorsConfiguration corsConfiguration = new CorsConfiguration();
-            corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://activustdstest1-kappa.vercel.app","https://activustdstest1-shyamyobels-projects.vercel.app","https://activus-server-production.up.railway.app","https://activus-iota.vercel.app/login","https://activus-iota.vercel.app/")); // Frontend origin
+            corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://activustdstest1-kappa.vercel.app","https://activustdstest1-shyamyobels-projects.vercel.app","https://activus-server-production.up.railway.app","https://activus-rho.vercel.app/login","https://activus-rho.vercel.app/")); // Frontend origin
             corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
             corsConfiguration.setAllowCredentials(true);
