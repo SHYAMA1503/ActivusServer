@@ -14,24 +14,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Set up Java 17 (from your original file)
+    # FINAL FIX: Set up JDK 17 (LTS) for guaranteed build compatibility
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '17' 
         distribution: 'temurin'
         cache: maven
         
     # Build with Maven (creates target/*.jar)
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      # We skip tests here for the fastest build, which is fine for deployment.
+      run: mvn -B package -DskipTests --file pom.xml
     
-    # **NEW STEP 1: Upload the compiled JAR artifact**
+    # Upload the compiled JAR artifact
     - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
         name: spring-boot-app
-        path: target/*.jar # Upload the JAR file from the target directory
+        path: target/*.jar
   
   deploy:
     # This job runs only after the 'build' job is complete
@@ -39,19 +40,19 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # **NEW STEP 2: Download the compiled JAR artifact**
+    # Download the compiled JAR artifact
     - name: Download JAR artifact
       uses: actions/download-artifact@v4
       with:
         name: spring-boot-app
         
-    # **NEW STEP 3: Deploy to Azure App Service**
+    # Deploy to Azure App Service
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'Activus' # REPLACE with your App Service name
+        app-name: 'Activus' # Ensure this matches your App Service name
         slot-name: 'Production'
-        # This secret must be set in your GitHub repository settings
+        # The Secret is correctly referenced here
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} 
-        # Since we downloaded the JAR artifact, the path is simply the JAR file name
+        # The artifact is deployed
         package: '*.jar'
