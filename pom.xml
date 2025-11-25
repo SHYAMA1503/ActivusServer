@@ -6,8 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+		<relativePath/> </parent>
 	<groupId>com.example</groupId>
 	<artifactId>iTDS</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -36,9 +35,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-            <groupId>com.azure</groupId>
-            <artifactId>azure-storage-blob</artifactId>
-            <version>12.25.1</version> </dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
+            <version>12.25.1</version> </dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -110,7 +109,14 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-		</plugins>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.14.2</version> <configuration>
+					<release>21</release> 
+				</configuration>
+			</plugin>
+            </plugins>
 	</build>
 
 </project>
